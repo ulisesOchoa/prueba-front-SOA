@@ -13,6 +13,7 @@ type State = {
 	passwordConfirmation: string;
 	successful: boolean;
 	message: string;
+	loading: boolean;
 };
 
 export default class Register extends Component<Props, State> {
@@ -27,6 +28,7 @@ export default class Register extends Component<Props, State> {
 			passwordConfirmation: "",
 			successful: false,
 			message: "",
+			loading: false
 		};
 	}
 
@@ -37,9 +39,7 @@ export default class Register extends Component<Props, State> {
 					"len",
 					"El nombre de usuario debe contener de 3 a 20 caracteres.",
 					(val: any) =>
-						val &&
-						val.toString().length >= 3 &&
-						val.toString().length <= 20
+						val && val.toString().length >= 3 && val.toString().length <= 20
 				)
 				.required("Este campo es obligatorio!"),
 			email: Yup.string()
@@ -50,9 +50,7 @@ export default class Register extends Component<Props, State> {
 					"len",
 					"La contraseña debe contener de 6 a 40 caracteres.",
 					(val: any) =>
-						val &&
-						val.toString().length >= 6 &&
-						val.toString().length <= 40
+						val && val.toString().length >= 6 && val.toString().length <= 40
 				)
 				.required("Este campo es obligatorio!"),
 			passwordConfirmation: Yup.string().test(
@@ -71,19 +69,26 @@ export default class Register extends Component<Props, State> {
 		password: string;
 		passwordConfirmation: string;
 	}) {
-		const { username, email, password } = formValue;
+		const { username, email, password, passwordConfirmation } = formValue;
 
 		this.setState({
 			message: "",
 			successful: false,
+			loading: true,
 		});
 
-		AuthService.register(username, email, password).then(
+		AuthService.register(username, email, password, passwordConfirmation).then(
 			(response) => {
-				this.setState({
-					message: response.data.message,
-					successful: true,
-				});
+				if (response.status === 200) {
+					this.setState({
+						message: 'Usuario creado correctamente.',
+						successful: true,
+					});
+	
+					setTimeout(() => {						
+						window.location.reload();
+					}, 4000);
+				}
 			},
 			(error) => {
 				const resMessage =
@@ -96,13 +101,14 @@ export default class Register extends Component<Props, State> {
 				this.setState({
 					successful: false,
 					message: resMessage,
+					loading: false,
 				});
 			}
 		);
 	}
 
 	render() {
-		const { successful, message } = this.state;
+		const { successful, message, loading } = this.state;
 
 		const initialValues = {
 			username: "",
@@ -126,12 +132,22 @@ export default class Register extends Component<Props, State> {
 						onSubmit={this.handleRegister}
 					>
 						<Form>
+							{message && (
+								<div className="form-group">
+									<div
+										className={
+											successful ? "alert alert-success" : "alert alert-danger"
+										}
+										role="alert"
+									>
+										{message}
+									</div>
+								</div>
+							)}
 							{!successful && (
 								<div>
 									<div className="form-group">
-										<label htmlFor="username">
-											Nombre de usuario
-										</label>
+										<label htmlFor="username">Nombre de usuario</label>
 										<Field
 											name="username"
 											type="text"
@@ -146,11 +162,7 @@ export default class Register extends Component<Props, State> {
 
 									<div className="form-group">
 										<label htmlFor="email"> Correo </label>
-										<Field
-											name="email"
-											type="email"
-											className="form-control"
-										/>
+										<Field name="email" type="email" className="form-control" />
 										<ErrorMessage
 											name="email"
 											component="div"
@@ -159,9 +171,7 @@ export default class Register extends Component<Props, State> {
 									</div>
 
 									<div className="form-group">
-										<label htmlFor="password">
-											Contraseña
-										</label>
+										<label htmlFor="password">Contraseña</label>
 										<Field
 											name="password"
 											type="password"
@@ -194,24 +204,13 @@ export default class Register extends Component<Props, State> {
 										<button
 											type="submit"
 											className="btn btn-primary btn-block"
+											disabled={loading}
 										>
-											Crear cuenta
+											{loading && (
+												<span className="spinner-border spinner-border-sm"></span>
+											)}
+											<span>Crear cuenta</span>
 										</button>
-									</div>
-								</div>
-							)}
-
-							{message && (
-								<div className="form-group">
-									<div
-										className={
-											successful
-												? "alert alert-success"
-												: "alert alert-danger"
-										}
-										role="alert"
-									>
-										{message}
 									</div>
 								</div>
 							)}

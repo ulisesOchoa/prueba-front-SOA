@@ -3,15 +3,20 @@ import axios from "axios";
 const API_URL = process.env.REACT_APP_AUTH_DOMAIN;
 
 class AuthService {
-	login(username: string, password: string) {
+	async login(email: string, password: string) {
 		return axios
-			.post(API_URL + "signin", {
-				username,
+			.post(API_URL + "login", {
+				email,
 				password,
 			})
 			.then((response) => {
-				if (response.data.accessToken) {
-					localStorage.setItem("user", JSON.stringify(response.data));
+				if (response.status === 200) {					
+					const userData = {
+						...response.data.model.user,
+						token: response.data.model.token,
+						roles: response.data.model.user.roles,
+					};
+					localStorage.setItem("user", JSON.stringify(userData));
 				}
 
 				return response.data;
@@ -22,11 +27,12 @@ class AuthService {
 		localStorage.removeItem("user");
 	}
 
-	register(username: string, email: string, password: string) {
-		return axios.post(API_URL + "signup", {
-			username,
+	register(name: string, email: string, password: string, password_confirmation: string) {
+		return axios.post(API_URL + "register", {
+			name,
 			email,
 			password,
+			password_confirmation
 		});
 	}
 

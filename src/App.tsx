@@ -11,8 +11,9 @@ import Register from "./components/register.component";
 import Home from "./components/home.component";
 import Profile from "./components/profile.component";
 import BoardUser from "./components/board-user.component";
-// import BoardModerator from "./components/board-moderator.component";
-// import BoardAdmin from "./components/board-admin.component";
+import BoardTask from "./components/board-task.component";
+import BoardModerator from "./components/board-moderator.component";
+import BoardAdmin from "./components/board-admin.component";
 
 import EventBus from "./common/EventBus";
 
@@ -40,10 +41,13 @@ class App extends Component<Props, State> {
 		const user = AuthService.getCurrentUser();
 
 		if (user) {
+			const superAdmin = user.roles.some((rol: any) => rol.name === "superAdmin");
+			const moderator = user.roles.some((rol: any) => rol.name === "moderator");
+			
 			this.setState({
 				currentUser: user,
-				showModeratorBoard: user.roles.includes("ROLE_MODERATOR"),
-				showAdminBoard: user.roles.includes("ROLE_ADMIN"),
+				showModeratorBoard: moderator ,
+				showAdminBoard: superAdmin,
 			});
 		}
 
@@ -70,19 +74,19 @@ class App extends Component<Props, State> {
 			<div>
 				<nav className="navbar navbar-expand navbar-dark bg-dark">
 					<Link to={"/"} className="navbar-brand">
-						bezKoder
+						SOA
 					</Link>
 					<div className="navbar-nav mr-auto">
 						<li className="nav-item">
 							<Link to={"/home"} className="nav-link">
-								Home
+								Inicio
 							</Link>
 						</li>
 
 						{showModeratorBoard && (
 							<li className="nav-item">
 								<Link to={"/mod"} className="nav-link">
-									Moderator Board
+									Tablero de moderador
 								</Link>
 							</li>
 						)}
@@ -90,7 +94,7 @@ class App extends Component<Props, State> {
 						{showAdminBoard && (
 							<li className="nav-item">
 								<Link to={"/admin"} className="nav-link">
-									Admin Board
+									Tablero de administrador
 								</Link>
 							</li>
 						)}
@@ -98,7 +102,15 @@ class App extends Component<Props, State> {
 						{currentUser && (
 							<li className="nav-item">
 								<Link to={"/user"} className="nav-link">
-									User
+									Usuarios
+								</Link>
+							</li>
+						)}
+
+						{currentUser && (
+							<li className="nav-item">
+								<Link to={"/task"} className="nav-link">
+									Tareas
 								</Link>
 							</li>
 						)}
@@ -108,7 +120,7 @@ class App extends Component<Props, State> {
 						<div className="navbar-nav ml-auto">
 							<li className="nav-item">
 								<Link to={"/profile"} className="nav-link">
-									{currentUser.username}
+									Perfil: {currentUser.name}
 								</Link>
 							</li>
 							<li className="nav-item">
@@ -146,8 +158,9 @@ class App extends Component<Props, State> {
 						<Route path="/register" element={<Register />} />
 						<Route path="/profile" element={<Profile />} />
 						<Route path="/user" element={<BoardUser />} />
-						{/* <Route path="/mod" element={<BoardModerator />} />
-						<Route path="/admin" element={<BoardAdmin />} /> */}
+						<Route path="/task" element={<BoardTask />} />
+						<Route path="/mod" element={<BoardModerator />} />
+						<Route path="/admin" element={<BoardAdmin />} />
 					</Routes>
 				</div>
 

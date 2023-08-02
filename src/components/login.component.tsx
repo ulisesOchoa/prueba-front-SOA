@@ -1,5 +1,5 @@
 import { Component } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 
@@ -9,7 +9,7 @@ type Props = {};
 
 type State = {
 	redirect: string | null;
-	username: string;
+	email: string;
 	password: string;
 	loading: boolean;
 	message: string;
@@ -22,7 +22,7 @@ export default class Login extends Component<Props, State> {
 
 		this.state = {
 			redirect: null,
-			username: "",
+			email: "",
 			password: "",
 			loading: false,
 			message: "",
@@ -31,34 +31,34 @@ export default class Login extends Component<Props, State> {
 
 	componentDidMount() {
 		const currentUser = AuthService.getCurrentUser();
-
+		
 		if (currentUser) {
 			this.setState({ redirect: "/profile" });
 		}
 	}
 
 	componentWillUnmount() {
-		// window.location.reload();
-		// console.log(process.env.REACT_APP_AUTH_DOMAIN);
-		
+		if (this.state.redirect) {
+			window.location.reload();			
+		}
 	}
 
 	validationSchema() {
 		return Yup.object().shape({
-			username: Yup.string().required("This field is required!"),
-			password: Yup.string().required("This field is required!"),
+			email: Yup.string().required("El campo es obligatorio!"),
+			password: Yup.string().required("El campo es obligatorio!"),
 		});
 	}
 
-	handleLogin(formValue: { username: string; password: string }) {
-		const { username, password } = formValue;
-
+	handleLogin(formValue: { email: string; password: string }) {
+		const { email, password } = formValue;
+	
 		this.setState({
 			message: "",
 			loading: true,
 		});
 
-		AuthService.login(username, password).then(
+		AuthService.login(email, password).then(
 			() => {
 				this.setState({
 					redirect: "/profile",
@@ -81,15 +81,15 @@ export default class Login extends Component<Props, State> {
 	}
 
 	render() {
-		if (this.state.redirect) {
+		if (this.state.redirect) {			
 			return <Navigate to={this.state.redirect} />;
 		}
 
 		const { loading, message } = this.state;
 
 		const initialValues = {
-			username: "",
-			password: "",
+			email: "ulisesochoap@gmail.com",
+			password: "password",
 		};
 
 		return (
@@ -108,14 +108,14 @@ export default class Login extends Component<Props, State> {
 					>
 						<Form>
 							<div className="form-group">
-								<label htmlFor="username">Username</label>
-								<Field
-									name="username"
-									type="text"
-									className="form-control"
+								<label htmlFor="email"> Correo </label>
+								<Field 
+									name="email" 
+									type="email" 
+									className="form-control" 
 								/>
 								<ErrorMessage
-									name="username"
+									name="email"
 									component="div"
 									className="alert alert-danger"
 								/>
@@ -135,7 +135,7 @@ export default class Login extends Component<Props, State> {
 								/>
 							</div>
 
-							<div className="form-group">
+							<div className="form-group mt-4">
 								<button
 									type="submit"
 									className="btn btn-primary btn-block"
