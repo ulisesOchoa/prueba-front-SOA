@@ -12,6 +12,7 @@ import Home from "./components/home.component";
 import Profile from "./components/profile.component";
 import BoardUser from "./components/board-user.component";
 import BoardTask from "./components/board-task.component";
+import BoardTaskEdit from "./components/board-task-edit.component";
 import BoardModerator from "./components/board-moderator.component";
 import BoardAdmin from "./components/board-admin.component";
 
@@ -159,6 +160,7 @@ class App extends Component<Props, State> {
 						<Route path="/profile" element={<Profile />} />
 						<Route path="/user" element={<BoardUser />} />
 						<Route path="/task" element={<BoardTask />} />
+						<Route path="/task/edit/:id" element={<BoardTaskEdit />} />
 						<Route path="/mod" element={<BoardModerator />} />
 						<Route path="/admin" element={<BoardAdmin />} />
 					</Routes>

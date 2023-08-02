@@ -17,7 +17,7 @@ type State = {
 	successful: boolean;
 };
 
-export default class BoardUser extends Component<Props, State> {
+export default class BoardTask extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
@@ -42,14 +42,12 @@ export default class BoardUser extends Component<Props, State> {
 
 		TaskService.getTasks().then(
 			(response) => {
-			if (response.status === 200) {
-				// console.log(response.data.data);
-				
-				this.setState({
-					tasks: response.data.data,
-					loading: false
-				});
-			}
+				if (response.status === 200) {
+					this.setState({
+						tasks: response.data.data,
+						loading: false
+					});
+				}
 			},
 			(error) => {
 				this.setState({
@@ -115,8 +113,6 @@ export default class BoardUser extends Component<Props, State> {
 	}
 
 	deleteTask(id: number) {
-		console.log(id);
-
 		this.setState({
 			message: "",
 			successful: false,
@@ -150,6 +146,10 @@ export default class BoardUser extends Component<Props, State> {
 			}
 		);
 		
+	}
+
+	updateTask(id: number) {
+		this.setState({ redirect: `/task/edit/${id}` });
 	}
 
   render() {
@@ -262,14 +262,15 @@ export default class BoardUser extends Component<Props, State> {
 						<div className="row">
 							{ tasks.map((task, index) => (
 								<div key={index} className="col-lg-4 col-md-6 mb-4">
-										<div className="card">
+									<div className="card">
 										<div className="card-body">
 											<h5 className="card-title"> { task.name } </h5>
 											<p className="card-text"> { task.description } </p>
 											<p className="card-text"> asignado a:  { task.assigned_to?.name } </p>
 											<button className="btn btn-danger" onClick={() => this.deleteTask(task.id)}>Eliminar</button>
+											<button className="btn btn-info" onClick={() => this.updateTask(task.id)}>Editar</button>
 										</div>
-										</div>
+									</div>
 								</div>
 							))}
 						</div>
